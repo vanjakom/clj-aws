@@ -1,5 +1,8 @@
 (ns clj-aws.dynamo)
 
+
+(import com.amazonaws.services.dynamodbv2.model.PutItemRequest)
+
 (def ^:dynamic *client* nil)
 
 (def endpoints {
@@ -26,7 +29,15 @@
                   com.amazonaws.services.dynamodbv2.model.GetItemRequest
                   table
                   item-map)]
-    (.getItem *client* request)))
+    (item-map->map (.getItem (.getItem *client* request)))))
+
+(defn put-object [table request]
+  (let [request (new
+                  com.amazonaws.services.dynamodbv2.model.PutItemRequest
+                  table
+                  (map->item-map request))]
+    (.putItem *client* request)))
+
 
 (defn value->atrribute-value
   ([value]
