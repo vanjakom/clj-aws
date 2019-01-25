@@ -19,7 +19,6 @@
 
                   [amazonica "0.3.128"]
 
-                  [com.mungolab/clj-common "0.2.0-SNAPSHOT"]
-                  [com.mungolab/clj-aws "0.1.0-SNAPSHOT"]]
+                  [com.mungolab/clj-common "0.2.0-SNAPSHOT"]]
   :repl-options {
                   :nrepl-middleware [lighttable.nrepl.handler/lighttable-ops]})
