@@ -5,8 +5,7 @@
     [clj-common.logging :as logging]
     [clj-common.json :as json]
     [clj-common.io :as io]
-    [clj-common.jvm :as jvm]
-    clj-common.async))
+    [clj-common.jvm :as jvm]))
 
 (def ^:dynamic *channel-size* 1000)
 
