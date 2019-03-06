@@ -1,6 +1,7 @@
 (ns clj-aws.s3
   (:require
-    [clj-common.logging :as logging])
+   [clj-common.logging :as logging]
+   [amazonica.aws.s3 :as amazonica])
   (:import
     com.amazonaws.services.s3.AmazonS3ClientBuilder
     com.amazonaws.services.s3.AmazonS3Client
@@ -67,11 +68,45 @@
             continuation-token new-results)
           (sort new-results))))))
 
+(defn input-stream
+  [path]
+  (let [[bucket-name & name-seq] path
+        key (clojure.string/join *delimiter* name-seq)]
+    (object->input-stream
+      (get-object *client* bucket-name key))))
+
+(defn get-object-metadata
+  [path]
+  (let [[bucket-name & name-seq] path
+        key (clojure.string/join *delimiter* name-seq)]
+    (amazonica/get-object-metadata :bucket-name bucket-name :key key)))
+
+(defn object-metadata->on-s3
+  "Checks if object is available on S3, in case it was on Glacier"
+  [object-metadata]
+  
 (defn get-object
   ([bucket-name key]
    (get-object *client* bucket-name key))
   ([client bucket-name key]
    (.getObject client bucket-name key)))
+   
+(defn put-object
+  ([bucket-name key input-stream]
+   (put-object *client* bucket-name key))
+  ([request]
+   (put-object *client* request))
+  ([client bucket-name key input-stream]
+   (.putObject
+     client
+     bucket-name
+     key
+     input-stream
+     (new com.amazonaws.services.s3.model.ObjectMetadata)))
+  ([client request]
+   (.putObject
+     client
+     request)))
 
 (defn put-object
   ([bucket-name key input-stream]
@@ -114,12 +149,4 @@
 
 (defn object->input-stream [object]
   (.getObjectContent object))
-
-(defn input-stream
-  [path]
-  (let [[bucket-name & name-seq] path
-        key (clojure.string/join *delimiter* name-seq)]
-    (println key)
-    (object->input-stream
-      (get-object *client* bucket-name key))))
 
